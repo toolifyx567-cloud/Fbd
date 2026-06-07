@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Video Downloader</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      margin-top: 50px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+    h1 {
+      color: #1877f2;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 12px 40px 12px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .clear-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 30px;
+      cursor: pointer;
+      color: #888;
+      display: none;
+    }
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #1877f2;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #145dbf;
+    }
+    .video-preview {
+      margin-top: 20px;
+      display: none;
+    }
+    video {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    a.download-btn {
+      display: inline-block;
+      background: #42b72a;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a.download-btn:hover {
+      background: #36a420;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Facebook Video Downloader</h1>
+    <div class="input-wrapper">
+      <input type="text" id="fbLink" placeholder="Paste Facebook video link here...">
+      <span class="clear-btn" id="clearBtn">&times;</span>
+    </div>
+    <button id="fetchBtn">Fetch Video</button>
+
+    <div class="video-preview" id="videoPreview">
+      <video id="videoPlayer" controls autoplay muted></video>
+      <a id="downloadBtn" class="download-btn" href="#" download>Download Video</a>
+    </div>
+  </div>
+
+  <script>
+    const fbLink = document.getElementById("fbLink");
+    const clearBtn = document.getElementById("clearBtn");
+    const fetchBtn = document.getElementById("fetchBtn");
+    const videoPreview = document.getElementById("videoPreview");
+    const videoPlayer = document.getElementById("videoPlayer");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    // Show X button when input is not empty
+    fbLink.addEventListener("input", () => {
+      clearBtn.style.display = fbLink.value ? "block" : "none";
+    });
+
+    // Clear input when X is clicked
+    clearBtn.addEventListener("click", () => {
+      fbLink.value = "";
+      clearBtn.style.display = "none";
+    });
+
+    // Fetch video from backend
+    fetchBtn.addEventListener("click", async () => {
+      const url = fbLink.value.trim();
+      if (!url) {
+        alert("Please paste a Facebook link.");
+        return;
+      }
+
+      try {
+        const res = await fetch("YOUR_RENDER_BACKEND_URL/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          videoPlayer.src = data.url;
+          downloadBtn.href = data.url;
+          videoPreview.style.display = "block";
+        } else {
+          alert("Failed to fetch video. Please check the link.");
+        }
+      } catch (err) {
+        alert("Server error. Please try again later.");
+      }
+    });
+  </script>
+</body>
+</html>
